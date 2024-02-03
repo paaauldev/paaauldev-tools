@@ -1,0 +1,29 @@
+name: Build and Deploy App
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código fuente
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20.11.0'
+      - name: Instalar pnpm
+        run: npm install -g pnpm
+      - name: Instalar dependencias
+        run: pnpm install
+      - name: Construir la aplicación
+        run: pnpm run build
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          password: ${{ secrets.PASSWORD }}
+          local-dir: './dist/'
+          server-dir: '/'
+          protocol: 'ftp'
